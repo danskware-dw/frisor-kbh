@@ -9,6 +9,10 @@ import { ChevronLeft, ChevronRight, Play, X, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GalleryItem } from "@/types/site";
 
+function getVideoPreviewSource(src: string) {
+  return `${src.split("#", 1)[0]}#t=0.1`;
+}
+
 export function Gallery({ items }: { items: GalleryItem[] }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
@@ -129,12 +133,18 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
               >
                 {item.mediaType === "video" ? (
                   <video
-                    src={item.src}
+                    src={getVideoPreviewSource(item.src)}
                     aria-label={item.alt}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     muted
                     playsInline
                     preload="metadata"
+                    onLoadedMetadata={(event) => {
+                      const video = event.currentTarget;
+                      if (video.duration > 0 && video.currentTime < 0.1) {
+                        video.currentTime = Math.min(0.1, video.duration / 2);
+                      }
+                    }}
                   />
                 ) : !imgErrors[item.id] ? (
                   <Image
@@ -155,7 +165,14 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   </div>
                 )}
 
-                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <div
+                  className={cn(
+                    "absolute inset-0 flex items-center justify-center rounded-xl transition-[opacity,background-color] duration-300 group-hover:bg-black/50 group-hover:opacity-100 group-focus-visible:bg-black/50 group-focus-visible:opacity-100",
+                    item.mediaType === "video"
+                      ? "bg-black/15 opacity-100"
+                      : "bg-black/50 opacity-0 backdrop-blur-[2px]"
+                  )}
+                >
                   <span className="flex items-center gap-2 rounded-lg border border-white/30 bg-black/30 px-5 py-2.5 text-sm font-medium uppercase tracking-widest text-white">
                     {item.mediaType === "video" ? (
                       <Play className="h-4 w-4" aria-hidden="true" />
