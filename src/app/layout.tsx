@@ -21,6 +21,9 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: siteConfig.seo.defaultTitle,
   description: siteConfig.seo.defaultDescription,
+  authors: [{ name: "DanskWare" }],
+  creator: "DanskWare",
+  generator: "DanskWare",
   metadataBase: new URL(siteConfig.url || "http://localhost:3000"),
   openGraph: {
     title: siteConfig.seo.defaultTitle,
@@ -77,6 +80,10 @@ function buildJsonLd() {
     "@type": "BarberShop",
     name: siteConfig.businessName,
     description: siteConfig.seo.defaultDescription,
+    creator: {
+      "@type": "Organization",
+      name: "DanskWare",
+    },
     image: `${siteConfig.url}/og-image.png`,
     "@id": siteConfig.url,
     url: siteConfig.url,

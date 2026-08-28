@@ -115,10 +115,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/[0.06] flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[var(--color-text-muted)] text-xs">
-            &copy; {currentYear} {siteConfig.businessName}. Alle rettigheder forbeholdes.
-          </p>
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 md:flex-row">
+          <div className="text-center text-xs text-[var(--color-text-muted)] md:text-left">
+            <p>
+              &copy; {currentYear} {siteConfig.businessName}. Alle rettigheder forbeholdes.
+            </p>
+            <p className="mt-1">
+              Hjemmeside udviklet af <span className="text-[var(--color-brand-light)]">DanskWare</span>.
+            </p>
+          </div>
           <div className="text-[var(--color-text-muted)] text-xs hover:text-white transition-colors">
             <a href="/privatlivspolitik">Privatlivspolitik</a>
           </div>

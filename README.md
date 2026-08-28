@@ -69,3 +69,16 @@ Dette projekt er optimeret til lynhurtig deployment på Vercel:
 2. Opret et nyt projekt i Vercel og importer repository'et.
 3. Vercel opdager automatisk Next.js og opsætter de rigtige build-kommandoer (`npm run build`).
 4. Klik på "Deploy".
+
+### Bookingbekræftelser med Resend
+
+Når en booking er oprettet, sender systemet automatisk en bekræftelse til kunden og en ny booking-notifikation til salonen. Tilføj disse miljøvariabler lokalt og i Vercel:
+
+```bash
+RESEND_API_KEY="re_..."
+EMAIL_FROM="FRISØR KBH <booking@frisorkbh.dk>"
+EMAIL_REPLY_TO="frisorkbh@hotmail.com"
+BOOKING_NOTIFICATION_EMAIL="kbhfrisor@gmail.com"
+```
+
+Domænet i `EMAIL_FROM` skal være verificeret i Resend. `EMAIL_REPLY_TO` er den adresse, kundens svar sendes til. `BOOKING_NOTIFICATION_EMAIL` er den adresse, der modtager besked om nye bookinger.

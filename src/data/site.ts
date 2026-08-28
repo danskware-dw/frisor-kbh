@@ -9,7 +9,7 @@ export const siteConfig: SiteConfig = {
   description:
     "FRISØR KBH er en lokal herrefrisør på Vesterbrogade med fokus på herreklip, skin fade og skægtrimning i en rolig og professionel salon.",
   // REC-13: reads from environment so staging/production use the correct domain
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://frisor-kbh.dk",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.frisorkbh.dk",
   contact: {
     phone: "+45 42 20 24 29",
     email: "frisorkbh@hotmail.com",

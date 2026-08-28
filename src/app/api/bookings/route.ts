@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { createBooking } from "@/lib/booking/create-booking";
 import { BookingError } from "@/lib/booking/errors";
 import { createBookingSchema } from "@/lib/booking/validation";
-import { sendBookingConfirmation } from "@/lib/notifications/send-confirmation";
+import {
+  sendBookingConfirmation,
+  sendOwnerBookingNotification,
+} from "@/lib/notifications/send-confirmation";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +29,23 @@ export async function POST(request: NextRequest) {
       `[Booking] Created ${booking.id} for ${booking.customerName} in ${Date.now() - startTime}ms`
     );
 
-    // Send confirmation email (fire-and-forget — don't block the response)
-    sendBookingConfirmation(booking).catch((emailError) => {
-      console.error(
-        `[Booking] Email failed for ${booking.id}:`,
-        emailError
-      );
+    // Keep the serverless invocation alive until the email attempt has settled,
+    // without making the customer wait for Resend before seeing confirmation.
+    after(async () => {
+      const notifications = await Promise.allSettled([
+        sendBookingConfirmation(booking),
+        sendOwnerBookingNotification(booking),
+      ]);
+
+      const labels = ["customer confirmation", "owner notification"];
+      notifications.forEach((notification, index) => {
+        if (notification.status === "rejected") {
+          console.error(
+            `[Booking] ${labels[index]} failed for ${booking.id}:`,
+            notification.reason
+          );
+        }
+      });
     });
 
     return NextResponse.json({ booking }, { status: 201 });

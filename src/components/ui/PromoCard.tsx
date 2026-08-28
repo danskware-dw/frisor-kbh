@@ -108,7 +108,7 @@ export function PromoCard() {
             id="promo-card-title"
             className="mb-1 font-heading text-[1.15rem] leading-tight text-white"
           >
-            Ny kunde?
+            Klar til en frisk klipning?
           </h2>
           <p
             id="promo-card-offer"

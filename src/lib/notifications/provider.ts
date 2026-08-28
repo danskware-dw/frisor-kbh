@@ -9,6 +9,7 @@ export interface SendEmailOptions {
   subject: string;
   html: string;
   text?: string;
+  replyTo?: string;
 }
 
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
@@ -23,11 +24,14 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   }
 
   const defaultFrom =
-    process.env.EMAIL_FROM || "FRISØR KBH <booking@frisor-kbh.dk>";
+    process.env.EMAIL_FROM || "FRISØR KBH <booking@frisorkbh.dk>";
 
   const { error } = await resend.emails.send({
     from: defaultFrom,
-    replyTo: process.env.EMAIL_REPLY_TO || siteConfig.contact.email,
+    replyTo:
+      options.replyTo ||
+      process.env.EMAIL_REPLY_TO ||
+      siteConfig.contact.email,
     to: options.to,
     subject: options.subject,
     html: options.html,
