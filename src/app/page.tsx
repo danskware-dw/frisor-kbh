@@ -9,6 +9,7 @@ import { Gallery } from "@/components/sections/Gallery";
 import { Contact } from "@/components/sections/Contact";
 import { BookingCTA } from "@/components/sections/BookingCTA";
 import { FloatingBookingButton } from "@/components/ui/FloatingBookingButton";
+import { PromoCard } from "@/components/ui/PromoCard";
 import { asc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { galleryImages, treatments } from "@/lib/db/schema";
@@ -67,6 +68,7 @@ export default async function Home() {
       <Footer />
 
       <FloatingBookingButton />
+      <PromoCard />
     </>
   );
 }
