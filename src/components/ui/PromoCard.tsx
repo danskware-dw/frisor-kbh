@@ -13,7 +13,7 @@ export function PromoCard() {
 
   useEffect(() => {
     setMounted(true);
-    const dismissed = sessionStorage.getItem("promoCardClosed") === "true";
+    const dismissed = sessionStorage.getItem("promoCardClosed_v2") === "true";
     if (dismissed) {
       setIsDismissed(true);
     } else {
@@ -24,7 +24,7 @@ export function PromoCard() {
 
   const handleClose = () => {
     setIsVisible(false);
-    sessionStorage.setItem("promoCardClosed", "true");
+    sessionStorage.setItem("promoCardClosed_v2", "true");
     setTimeout(() => setIsDismissed(true), 400); // Match animation duration
   };
 
@@ -56,7 +56,7 @@ export function PromoCard() {
       <div className="flex items-start gap-4 mb-4">
         <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0 border border-[var(--color-brand)]/30 mt-1">
           <Image
-            src="/images/pensionist-saks-customer-owner.png"
+            src="/images/promo-image.png"
             alt="Frisør ejer med saks"
             fill
             className="object-cover"
