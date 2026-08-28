@@ -77,7 +77,7 @@ export function PromoCard() {
           : "translate-x-8 opacity-0 pointer-events-none motion-reduce:translate-x-0"
       )}
       aria-labelledby="promo-card-title"
-      aria-describedby="promo-card-offer promo-card-condition"
+      aria-describedby="promo-card-offer"
       aria-hidden={!isVisible}
     >
       <button
@@ -128,12 +128,6 @@ export function PromoCard() {
       >
         BOOK TIL 150 KR.
       </Button>
-      <p
-        id="promo-card-condition"
-        className="mt-1.5 text-center text-[10px] font-medium text-[var(--color-text-muted)] md:mt-2"
-      >
-        Kun for nye kunder.
-      </p>
     </aside>
   );
 }
