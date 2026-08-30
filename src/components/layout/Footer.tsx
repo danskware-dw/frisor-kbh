@@ -121,7 +121,16 @@ export function Footer() {
               &copy; {currentYear} {siteConfig.businessName}. Alle rettigheder forbeholdes.
             </p>
             <p className="mt-1">
-              Hjemmeside udviklet af <span className="text-[var(--color-brand-light)]">DanskWare</span>.
+              Hjemmeside udviklet af{" "}
+              <a
+                href="https://danskware.dk/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-brand-light)] transition-colors hover:text-white"
+              >
+                DanskWare
+              </a>
+              .
             </p>
           </div>
           <div className="text-[var(--color-text-muted)] text-xs hover:text-white transition-colors">
