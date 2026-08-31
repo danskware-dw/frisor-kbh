@@ -26,14 +26,21 @@ const navItems = [
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  className,
+  onNavigate,
+}: {
+  className?: string;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-gray-200 bg-white">
+    <aside className={cn("flex h-full w-64 flex-col border-r border-gray-200 bg-white", className)}>
       <div className="flex h-16 items-center border-b border-gray-200 px-6">
         <Link
           href="/"
+          onClick={onNavigate}
           aria-label="Gå til FRISØR KBH-forsiden"
           className="rounded-sm text-xl font-bold tracking-tight text-gray-900 transition-colors hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-4"
         >
@@ -49,6 +56,7 @@ export function AdminSidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 isActive
@@ -80,6 +88,6 @@ export function AdminSidebar() {
           </button>
         </form>
       </div>
-    </div>
+    </aside>
   );
 }

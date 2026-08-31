@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-screen-2xl space-y-4 sm:space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">
@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* KPI Row */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         <Scorecard
           title="Total Bookings (Today)"
           value="18"
@@ -77,8 +77,8 @@ export default async function AdminDashboardPage() {
       />
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
+        <div className="min-w-0 lg:col-span-2">
           <BookingTrendsChart />
         </div>
         <div>

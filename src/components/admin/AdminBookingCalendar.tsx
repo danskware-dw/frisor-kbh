@@ -164,7 +164,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2" aria-label="Kalendernavigation">
+        <div className="grid grid-cols-[auto_auto_auto_1fr] items-center gap-2 sm:flex sm:flex-wrap" aria-label="Kalendernavigation">
           <button
             type="button"
             onClick={() => moveWeek(-1)}
@@ -190,7 +190,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
           </button>
           <Link
             href="/admin/bookings"
-            className="ml-auto inline-flex h-11 items-center rounded-lg bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+            className="ml-auto inline-flex h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 text-center text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:px-4"
           >
             Vis alle bookinger
           </Link>
@@ -198,7 +198,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
       </div>
 
       {/* Compact agenda for phones and tablets */}
-      <div className="p-4 lg:hidden">
+      <div className="p-3 sm:p-4 lg:hidden">
         <div className="grid grid-cols-7 gap-1" role="tablist" aria-label="Vælg dag">
           {days.map((day) => {
             const dateKey = toDateKey(day);
@@ -212,7 +212,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
                 role="tab"
                 aria-selected={isSelected}
                 onClick={() => setSelectedDate(dateKey)}
-                className={`min-h-16 cursor-pointer rounded-lg px-1 py-2 text-center transition-colors focus-visible:ring-2 focus-visible:ring-emerald-600 ${
+                className={`min-h-16 min-w-0 cursor-pointer rounded-lg px-0.5 py-2 text-center transition-colors focus-visible:ring-2 focus-visible:ring-emerald-600 sm:px-1 ${
                   isSelected
                     ? "bg-emerald-700 text-white"
                     : isToday

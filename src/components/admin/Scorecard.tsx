@@ -12,7 +12,7 @@ export function Scorecard({
   icon: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-gray-500">{title}</p>
         <div className="rounded-md bg-emerald-50 p-2 text-emerald-600">
