@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, LockKeyhole } from "lucide-react";
 import {
   setAdminStatus,
   type AdminStatusActionState,
@@ -62,11 +62,11 @@ export function AdminStatusControl({
         aria-describedby={describedBy}
         disabled={isDisabled}
         className={cn(
-          "inline-flex min-h-11 items-center gap-2.5 rounded-full border px-3 py-2 text-xs font-semibold transition-[background-color,border-color,color,opacity] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-55",
+          "group inline-flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm font-semibold transition-[background-color,color,opacity] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-65",
           displayedActive
-            ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-            : "border-gray-300 bg-gray-100 text-gray-700",
-          !isDisabled && "cursor-pointer hover:border-emerald-500"
+            ? "text-emerald-800"
+            : "text-gray-700",
+          !isDisabled && "cursor-pointer hover:bg-gray-50"
         )}
       >
         {pending ? (
@@ -75,18 +75,23 @@ export function AdminStatusControl({
         <span>{pending ? "Gemmer…" : displayedActive ? "Aktiv" : "Inaktiv"}</span>
         <span
           className={cn(
-            "relative h-6 w-11 rounded-full transition-colors duration-200",
-            displayedActive ? "bg-emerald-700" : "bg-gray-400"
+            "relative h-6 w-11 shrink-0 rounded-full ring-1 ring-inset transition-colors duration-200",
+            displayedActive
+              ? "bg-emerald-700 ring-emerald-700"
+              : "bg-gray-400 ring-gray-400"
           )}
           aria-hidden="true"
         >
           <span
             className={cn(
-              "absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 motion-reduce:transition-none",
-              displayedActive ? "translate-x-6" : "translate-x-1"
+              "absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 motion-reduce:transition-none",
+              displayedActive ? "translate-x-5" : "translate-x-0"
             )}
           />
         </span>
+        {isCurrent ? (
+          <LockKeyhole className="h-4 w-4 text-gray-500" aria-hidden="true" />
+        ) : null}
       </button>
 
       {isCurrent ? (
