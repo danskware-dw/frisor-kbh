@@ -676,6 +676,19 @@ export default function BookingWizard() {
                 </p>
               </div>
               <div className="mx-auto grid max-w-2xl gap-3 md:grid-cols-2">
+                {allEmployees.length === 0 ? (
+                  <div className="rounded-[22px] border border-gray-200 bg-gray-50 px-6 py-10 text-center md:col-span-2">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-500">
+                      <UserRound className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Ingen medarbejdere er tilgængelige
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                      Ring til os for hjælp med at bestille en tid.
+                    </p>
+                  </div>
+                ) : null}
                 {allEmployees.map((employee) => (
                   <button
                     key={employee.id}

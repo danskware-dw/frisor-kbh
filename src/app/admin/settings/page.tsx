@@ -1,8 +1,9 @@
 import { getDb } from "@/lib/db/client";
-import { adminUsers } from "@/lib/db/schema";
-import { desc } from "drizzle-orm";
+import { adminUsers, employees } from "@/lib/db/schema";
+import { asc, desc } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth/admin";
 import { AdminStatusControl } from "@/components/admin/AdminStatusControl";
+import { EmployeeStatusControl } from "@/components/admin/EmployeeStatusControl";
 
 export const dynamic = "force-dynamic";
 
@@ -10,10 +11,10 @@ export default async function SettingsPage() {
   const currentAdmin = await requireAdmin();
   const db = getDb();
   
-  const users = await db
-    .select()
-    .from(adminUsers)
-    .orderBy(desc(adminUsers.createdAt));
+  const [users, staffMembers] = await Promise.all([
+    db.select().from(adminUsers).orderBy(desc(adminUsers.createdAt)),
+    db.select().from(employees).orderBy(asc(employees.createdAt)),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -76,13 +77,63 @@ export default async function SettingsPage() {
         </div>
       </div>
 
-      {/* Administrator List */}
+      {/* Booking employees */}
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 bg-gray-50/50 px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-900">Bookingmedarbejdere</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Styr hvem kunder kan vælge, når de bestiller en tid.
+          </p>
+        </div>
+
+        {staffMembers.length === 0 ? (
+          <div className="p-12 text-center">
+            <p className="text-sm text-gray-500">Ingen bookingmedarbejdere fundet.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-gray-500">
+              <thead className="bg-white text-xs uppercase text-gray-400">
+                <tr>
+                  <th scope="col" className="px-6 py-3 font-semibold">Navn</th>
+                  <th scope="col" className="px-6 py-3 font-semibold">Booking</th>
+                  <th scope="col" className="px-6 py-3 font-semibold text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {staffMembers.map((employee) => (
+                  <tr key={employee.id} className="transition-colors hover:bg-gray-50/50">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="font-medium text-gray-900">{employee.name}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {employee.active ? "Synlig for kunder" : "Skjult for kunder"}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                      <EmployeeStatusControl
+                        employee={{
+                          id: employee.id,
+                          name: employee.name,
+                          active: employee.active,
+                        }}
+                        canManage={currentAdmin.role === "admin"}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Administrator access */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50/50 px-6 py-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Administratorer</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Dashboard-adgang</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Aktive administratorer kan logge ind og bruge dashboardet.
+              Separate login-konti til administration. Dette er ikke bookingmedarbejdere.
             </p>
           </div>
           <button className="rounded-md bg-white border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
