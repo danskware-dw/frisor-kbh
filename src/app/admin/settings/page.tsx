@@ -1,10 +1,13 @@
 import { getDb } from "@/lib/db/client";
 import { adminUsers } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/admin";
+import { AdminStatusControl } from "@/components/admin/AdminStatusControl";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
+  const currentAdmin = await requireAdmin();
   const db = getDb();
   
   const users = await db
@@ -78,7 +81,9 @@ export default async function SettingsPage() {
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50/50 px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Administratorer</h2>
-            <p className="mt-1 text-sm text-gray-500">Personer med adgang til dette dashboard.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Aktive administratorer kan logge ind og bruge dashboardet.
+            </p>
           </div>
           <button className="rounded-md bg-white border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
             Tilføj Admin
@@ -113,15 +118,15 @@ export default async function SettingsPage() {
                       {user.role}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right">
-                      {user.isActive ? (
-                        <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                          Aktiv
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs font-semibold text-gray-500">
-                          Inaktiv
-                        </span>
-                      )}
+                      <AdminStatusControl
+                        user={{
+                          id: user.id,
+                          fullName: user.fullName,
+                          isActive: user.isActive,
+                        }}
+                        canManage={currentAdmin.role === "admin"}
+                        isCurrent={currentAdmin.id === user.id}
+                      />
                     </td>
                   </tr>
                 ))}
