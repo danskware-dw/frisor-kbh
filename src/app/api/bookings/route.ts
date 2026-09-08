@@ -1,4 +1,4 @@
-import { after, NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createBooking } from "@/lib/booking/create-booking";
 import { BookingError } from "@/lib/booking/errors";
 import { createBookingSchema } from "@/lib/booking/validation";
@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
       `[Booking] Created ${booking.id} for ${booking.customerName} in ${Date.now() - startTime}ms`
     );
 
-    // Keep the serverless invocation alive until the email attempt has settled,
-    // without making the customer wait for Resend before seeing confirmation.
-    after(async () => {
+    // Send emails synchronously before responding.
+    // Wrapped in try/catch so email failures never block the booking response.
+    try {
       const notifications = await Promise.allSettled([
         sendBookingConfirmation(booking),
         sendOwnerBookingNotification(booking),
@@ -44,9 +44,19 @@ export async function POST(request: NextRequest) {
             `[Booking] ${labels[index]} failed for ${booking.id}:`,
             notification.reason
           );
+        } else {
+          console.log(
+            `[Booking] ${labels[index]} sent for ${booking.id}`
+          );
         }
       });
-    });
+    } catch (emailError) {
+      // Log but don't fail the booking
+      console.error(
+        `[Booking] Email sending failed for ${booking.id}:`,
+        emailError
+      );
+    }
 
     return NextResponse.json({ booking }, { status: 201 });
   } catch (error) {
