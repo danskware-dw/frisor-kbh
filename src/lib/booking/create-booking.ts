@@ -7,6 +7,7 @@ import { getTreatmentById, getEmployeeById } from "./catalog";
 import { BookingError } from "./errors";
 import type { CreateBookingInput } from "./validation";
 import { isValidPhone, isValidEmail } from "./validation";
+import { getBookingPriceLabel } from "@/data/opening-offer";
 
 export type BookingResult = {
   id: string;
@@ -42,6 +43,7 @@ export async function createBooking(
 
   const treatment = await getTreatmentById(input.treatmentId);
   const employee = await getEmployeeById(input.employeeId);
+  const bookingPriceLabel = getBookingPriceLabel(treatment);
 
   const db = getDb();
 
@@ -93,7 +95,7 @@ export async function createBooking(
       id: bookingId,
       treatmentId: treatment.id,
       treatmentName: treatment.name,
-      priceLabel: treatment.price,
+      priceLabel: bookingPriceLabel,
       employeeId: employee.id,
       employeeName: employee.name,
       customerId,
@@ -110,7 +112,7 @@ export async function createBooking(
       id: bookingId,
       treatmentId: treatment.id,
       treatmentName: treatment.name,
-      priceLabel: treatment.price,
+      priceLabel: bookingPriceLabel,
       employeeId: employee.id,
       employeeName: employee.name,
       customerId,

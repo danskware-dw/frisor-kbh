@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { openingOffer } from "@/data/opening-offer";
 
 const PROMO_STORAGE_KEY = "promoCardClosed_v2";
 const PROMO_VISIBILITY_EVENT = "promo-card-visibility";
@@ -102,31 +103,31 @@ export function PromoCard() {
         </div>
         <div className="pr-8">
           <div className="text-[10px] font-bold text-[var(--color-brand-light)] tracking-widest uppercase mb-1">
-            ÅBNINGSTILBUD
+            {openingOffer.badge}
           </div>
           <h2
             id="promo-card-title"
             className="mb-1 font-heading text-[1.15rem] leading-tight text-white"
           >
-            Klar til en frisk klipning?
+            {openingOffer.headline}
           </h2>
           <p
             id="promo-card-offer"
             className="text-sm text-[var(--color-text-muted)]"
           >
-            Herreklip kun 150 kr.
+            {openingOffer.treatmentName} kun {openingOffer.priceLabel}
           </p>
         </div>
       </div>
 
       <Button
-        href="/booking?service=herreklip"
+        href={`/booking?service=${openingOffer.treatmentId}`}
         variant="primary"
         size="md"
         className="w-full text-sm h-10 shadow-md"
         tabIndex={isVisible ? undefined : -1}
       >
-        BOOK TIL 150 KR.
+        BOOK TIL {openingOffer.priceLabel.toUpperCase()}
       </Button>
     </aside>
   );
