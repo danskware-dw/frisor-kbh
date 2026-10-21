@@ -34,6 +34,22 @@ npm run build
 npm start
 ```
 
+## Lukkedage
+
+Administratorer kan oprette lukkedage direkte på dashboardet under **Lukkedage**. Vælg en dato, tilføj eventuelt en besked til kunderne, og tryk **Gem lukkedag**. **Rediger besked** ændrer teksten for den valgte dag. **Fjern lukkedag** lader datoen følge de normale åbningstider igen.
+
+Lukkedage vises på forsiden og bookingsiden og blokerer nye bookinger for alle medarbejdere og behandlinger. Andre åbningsdage kan stadig bookes. Eksisterende bookinger vises som en advarsel på dashboardet og aflyses ikke automatisk. Datoerne følger dansk tid (`Europe/Copenhagen`). En åben bookingside opdaterer lukkedage ved fokus og hvert minut; serveren kontrollerer altid datoen ved booking.
+
+Kør SQL-filen `drizzle/0003_salon_closures.sql` én gang i hvert databasemiljø, før denne version sættes i drift. Den opretter tabellen med RLS og begrænser adgang til serveren.
+
+### Test af booking og lukkedage
+
+```bash
+npm test
+```
+
+Testene bruger `TEST_DATABASE_URL` eller `DATABASE_URL` fra `.env.local`. De opretter et separat, midlertidigt databaseskema og fjerner det bagefter. Eksisterende kunder og bookinger ændres ikke, og der sendes ingen e-mails. Databasebrugeren skal kunne oprette skemaer; testmiljøet skal have Supabase-rollerne `anon` og `authenticated`.
+
 ## Projektstruktur
 - `src/app/` - Next.js App Router (sider, layouts, globale styles)
 - `src/components/` - Genanvendelige UI komponenter (layout, sektioner, ui-elementer)

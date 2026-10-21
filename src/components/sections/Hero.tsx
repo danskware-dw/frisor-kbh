@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
+import { ClosureNotices } from "@/components/booking/ClosureNotices";
+import type { SalonClosure } from "@/lib/booking/salon-closures";
 
-export function Hero() {
+export function Hero({ closures = [], today = "" }: { closures?: SalonClosure[]; today?: string }) {
   return (
     <section id="hero" className="relative flex min-h-[100svh] items-center justify-center overflow-hidden pb-10 pt-28">
       {/* Background Image */}
@@ -40,6 +42,7 @@ export function Hero() {
       </div>
 
       <Container className="relative z-10 w-full flex flex-col items-center text-center">
+        <ClosureNotices closures={closures} today={today} />
         <span className="text-[var(--color-brand-light)] font-semibold tracking-[0.2em] uppercase text-sm md:text-base mb-6 block animate-in fade-in slide-in-from-bottom-4 duration-700">
           Lokal herrefrisør på Frederiksberg
         </span>

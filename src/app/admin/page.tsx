@@ -8,10 +8,14 @@ import { AdminBookingCalendar } from "@/components/admin/AdminBookingCalendar";
 import { getDateKeyInTimeZone } from "@/lib/booking/business-hours";
 import { getDb } from "@/lib/db/client";
 import { bookings, customers } from "@/lib/db/schema";
+import { SalonClosures } from "@/components/admin/SalonClosures";
+import { listAdminSalonClosures } from "@/lib/booking/salon-closures";
+import { requireAdmin } from "@/lib/auth/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  const [currentAdmin, closures] = await Promise.all([requireAdmin(), listAdminSalonClosures()]);
   const db = getDb();
   const calendarRows = await db
     .select({
@@ -42,6 +46,8 @@ export default async function AdminDashboardPage() {
           Overview of today&apos;s business and upcoming appointments.
         </p>
       </div>
+
+      <SalonClosures closures={closures} today={getDateKeyInTimeZone()} canManage={currentAdmin.role === "admin"} />
 
       {/* KPI Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">

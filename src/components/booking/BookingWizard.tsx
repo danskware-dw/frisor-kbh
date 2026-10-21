@@ -16,6 +16,8 @@ import {
   UserRound,
 } from "lucide-react";
 import BookingCalendar from "@/components/booking/BookingCalendar";
+import { ClosureNotices } from "@/components/booking/ClosureNotices";
+import type { SalonClosure } from "@/lib/booking/salon-closures";
 import {
   formatDateLabel,
   isValidEmail,
@@ -83,10 +85,11 @@ function buildCalendarUrl(
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-export default function BookingWizard() {
+export default function BookingWizard({ initialClosures, today }: { initialClosures: SalonClosure[]; today: string }) {
   const searchParams = useSearchParams();
   const initialServiceId = searchParams.get("service");
   const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [closures, setClosures] = useState(initialClosures);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [step, setStep] = useState(0);
   const [selectedTreatment, setSelectedTreatment] = useState<string | null>(null);
@@ -110,6 +113,39 @@ export default function BookingWizard() {
   const stepHeadingRef = useRef<HTMLHeadingElement>(null);
   const errorAlertRef = useRef<HTMLDivElement>(null);
   const hasRestoredState = useRef(false);
+
+  // Keep an already-open calendar up to date when the owner changes a closure.
+  useEffect(() => {
+    const controller = new AbortController();
+    async function refreshClosures() {
+      try {
+        const response = await fetch("/api/salon-closures", { cache: "no-store", signal: controller.signal });
+        if (!response.ok) throw new Error("Kunne ikke hente lukkedage. Prøv igen.");
+        const payload: { closures: SalonClosure[] } = await response.json();
+        if (controller.signal.aborted) return;
+        setClosures(payload.closures);
+        if (!submitting && !successId && selectedDate && payload.closures.some((closure) => closure.date === selectedDate)) {
+          setSelectedDate(null);
+          setSelectedTime(null);
+          setAvailableSlots([]);
+          setStep(2);
+          setError("Salonen er lukket den valgte dag. Vælg en anden dato.");
+        }
+      } catch (refreshError) {
+        if (!controller.signal.aborted) {
+          setError(refreshError instanceof Error ? refreshError.message : "Kunne ikke hente lukkedage.");
+        }
+      }
+    }
+    void refreshClosures();
+    const interval = window.setInterval(refreshClosures, 60_000);
+    window.addEventListener("focus", refreshClosures);
+    return () => {
+      controller.abort();
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshClosures);
+    };
+  }, [selectedDate, submitting, successId]);
 
   // ── Fetch catalog on mount ──
   useEffect(() => {
@@ -155,7 +191,7 @@ export default function BookingWizard() {
         if (restoredTreatment) {
           setSelectedTreatment(restoredTreatment);
           setSelectedEmployee(restoredEmployee);
-          setSelectedDate(storedState?.date ?? null);
+          setSelectedDate(initialClosures.some((closure) => closure.date === storedState?.date) ? null : storedState?.date ?? null);
           setCustomer((current) => ({ ...current, ...storedState?.customer }));
           setStep(restoredEmployee ? 2 : 1);
         }
@@ -171,7 +207,7 @@ export default function BookingWizard() {
     return () => {
       cancelled = true;
     };
-  }, [initialServiceId]);
+  }, [initialServiceId, initialClosures]);
 
   const allTreatments = useMemo(() => catalog?.treatments ?? [], [catalog]);
   const allEmployees = useMemo(() => catalog?.employees ?? [], [catalog]);
@@ -231,8 +267,9 @@ export default function BookingWizard() {
       { cache: "no-store" }
     )
       .then(async (response) => {
-        if (!response.ok) throw new Error("Kunne ikke hente ledige tider.");
-        return response.json();
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error ?? "Kunne ikke hente ledige tider.");
+        return payload;
       })
       .then((payload) => {
         if (!cancelled) {
@@ -445,6 +482,8 @@ export default function BookingWizard() {
           </p>
         </div>
       </div>
+
+      <ClosureNotices closures={closures} today={today} />
 
       <div className="overflow-hidden rounded-[24px] border border-[var(--color-brand)]/30 bg-white shadow-xl md:rounded-[28px]">
         <nav aria-label="Booking trin">
@@ -737,6 +776,8 @@ export default function BookingWizard() {
               <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
                 <BookingCalendar
                   value={selectedDate ?? undefined}
+                  closedDates={closures.map((closure) => closure.date)}
+                  today={today}
                   onChange={(date) => {
                     setSelectedDate(date);
                     setSelectedTime(null);

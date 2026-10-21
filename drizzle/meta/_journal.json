@@ -22,6 +22,13 @@
       "when": 1787340043657,
       "tag": "0002_smooth_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792573007083,
+      "tag": "0003_salon_closures",
+      "breakpoints": true
     }
   ]
 }

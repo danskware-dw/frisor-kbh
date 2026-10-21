@@ -35,6 +35,11 @@ export const emailStatusEnum = pgEnum("email_status", [
 
 // ── Tables ─────────────────────────────────────────────────────────────────────
 
+export const salonClosures = pgTable("salon_closures", {
+  date: text("date").primaryKey(),
+  message: text("message").notNull().default(""),
+}).enableRLS();
+
 export const categories = pgTable("categories", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

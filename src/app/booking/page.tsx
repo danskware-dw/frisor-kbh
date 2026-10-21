@@ -2,6 +2,10 @@ import { Suspense } from "react";
 import BookingWizard from "@/components/booking/BookingWizard";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { listSalonClosures } from "@/lib/booking/salon-closures";
+import { getDateKeyInTimeZone } from "@/lib/booking/business-hours";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Bestil tid hos FRISØR KBH | Herrefrisør i København",
@@ -9,7 +13,8 @@ export const metadata = {
     "Bestil din næste frisørtid online hos FRISØR KBH på Vesterbrogade 171. Vi tilbyder herreklip, fades og skægtrimning.",
 };
 
-export default function BookingPage() {
+export default async function BookingPage() {
+  const closures = await listSalonClosures();
   return (
     <main
       id="main-content"
@@ -25,7 +30,7 @@ export default function BookingPage() {
           Tilbage til forsiden
         </Link>
         <Suspense fallback={<div className="rounded-[28px] border border-gray-200 bg-white p-8 text-center text-gray-700 shadow-lg" aria-live="polite">Henter booking…</div>}>
-          <BookingWizard />
+          <BookingWizard initialClosures={closures} today={getDateKeyInTimeZone()} />
         </Suspense>
       </div>
     </main>

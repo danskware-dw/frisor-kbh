@@ -48,6 +48,8 @@ export async function createBooking(
   const db = getDb();
 
   return await db.transaction(async (tx) => {
+    // Serialize closures and new bookings across all employees on this date.
+    await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${`salon:${input.date}`}))`);
     // Advisory lock to prevent race conditions on the same employee+date
     const bookingLockKey = `booking:${input.employeeId}:${input.date}`;
     await tx.execute(

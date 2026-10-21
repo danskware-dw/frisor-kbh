@@ -13,12 +13,14 @@ import { PromoCard } from "@/components/ui/PromoCard";
 import { asc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { galleryImages, treatments } from "@/lib/db/schema";
+import { listSalonClosures } from "@/lib/booking/salon-closures";
+import { getDateKeyInTimeZone } from "@/lib/booking/business-hours";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const db = getDb();
-  const [managedGalleryImages, managedTreatments] = await Promise.all([
+  const [managedGalleryImages, managedTreatments, closures] = await Promise.all([
     db
       .select()
       .from(galleryImages)
@@ -29,6 +31,7 @@ export default async function Home() {
       .from(treatments)
       .where(eq(treatments.active, true))
       .orderBy(asc(treatments.sortOrder)),
+    listSalonClosures(),
   ]);
 
   const galleryItems = managedGalleryImages.map((image) => ({
@@ -56,7 +59,7 @@ export default async function Home() {
       <Header />
       {/* REC-04: id="main-content" enables skip-to-content link target */}
       <main id="main-content" className="flex min-h-screen flex-col">
-        <Hero />
+        <Hero closures={closures} today={getDateKeyInTimeZone()} />
         <Services services={serviceItems} />
         <Benefits />
         <OpeningHours />

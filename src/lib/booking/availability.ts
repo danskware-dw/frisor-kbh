@@ -13,6 +13,7 @@ import {
 } from "./business-hours";
 import { rangesOverlap, timeToMinutes } from "./time";
 import { isValidDateKey } from "./validation";
+import { assertSalonOpen } from "./salon-closures";
 
 type BookedInterval = {
   start: number;
@@ -83,6 +84,8 @@ export async function getAvailability(query: AvailabilityQuery) {
     );
   }
 
+  await assertSalonOpen(query.date);
+
   const treatment = await getTreatmentById(query.treatmentId);
   await getEmployeeById(query.employeeId);
 
@@ -126,6 +129,7 @@ export async function assertSlotAvailable(
       "INVALID_DATE"
     );
   }
+  await assertSalonOpen(params.date, tx);
   if (
     !isBookableStartTime(params.date, params.time, params.durationMinutes)
   ) {

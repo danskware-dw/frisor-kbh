@@ -8,11 +8,13 @@ import { formatDateLabel, formatMonthLabel, getEndOfMonth, getStartOfMonth, isPa
 type BookingCalendarProps = {
   value?: string
   onChange: (date: string) => void
+  closedDates?: string[]
+  today?: string
 }
 
 const weekdayLabels = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn']
 
-export default function BookingCalendar({ value, onChange }: BookingCalendarProps) {
+export default function BookingCalendar({ value, onChange, closedDates = [], today }: BookingCalendarProps) {
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const today = new Date()
     return new Date(today.getFullYear(), today.getMonth(), 1)
@@ -86,7 +88,8 @@ export default function BookingCalendar({ value, onChange }: BookingCalendarProp
           }
 
           const key = toDateKey(day)
-          const disabled = isPastDay(day) || isWeekend(day)
+          const closed = closedDates.includes(key)
+          const disabled = (today ? key < today : isPastDay(day)) || isWeekend(day) || closed
           const selected = value === key
           const dateLabel = formatDateLabel(key)
 
@@ -95,7 +98,7 @@ export default function BookingCalendar({ value, onChange }: BookingCalendarProp
               key={key}
               type="button"
               disabled={disabled}
-              aria-label={disabled ? `${dateLabel}, ikke tilgængelig` : dateLabel}
+              aria-label={closed ? `${dateLabel}, salonen er lukket` : disabled ? `${dateLabel}, ikke tilgængelig` : dateLabel}
               aria-pressed={selected}
               onClick={() => onChange(key)}
               className={cn(
@@ -125,7 +128,7 @@ export default function BookingCalendar({ value, onChange }: BookingCalendarProp
           Ikke tilgængelig
         </span>
       </div>
-      <p className="mt-3 text-[12px] text-gray-600">Søndage er lukkedage og kan ikke bookes.</p>
+      <p className="mt-3 text-[12px] text-gray-600">Søndage og salonens lukkedage kan ikke bookes.</p>
     </div>
   )
 }
