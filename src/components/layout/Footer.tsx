@@ -1,4 +1,5 @@
 import React from "react";
+import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
 import { siteConfig, navigation } from "@/data/site";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
@@ -8,7 +9,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-black pt-16 pb-8">
+    <footer className="relative bg-black pt-16 pb-24 md:pb-8">
       {/* Gradient top border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--color-brand)]/50 to-transparent" />
 
@@ -133,8 +134,9 @@ export function Footer() {
               .
             </p>
           </div>
-          <div className="text-[var(--color-text-muted)] text-xs hover:text-white transition-colors">
-            <a href="/privatlivspolitik">Privatlivspolitik</a>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 text-[var(--color-text-muted)] text-xs">
+            <a href="/privatlivspolitik" className="hover:text-white transition-colors">Privatlivspolitik</a>
+            <CookieSettingsButton />
           </div>
         </div>
       </Container>

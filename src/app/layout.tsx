@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { CookieConsent } from "@/components/consent/CookieConsent";
 import { siteConfig, openingHours } from "@/data/site";
 
 const inter = Inter({
@@ -137,6 +138,7 @@ export default function RootLayout({
           Spring til indhold
         </a>
         {children}
+        <CookieConsent />
       </body>
     </html>
   );
