@@ -12,7 +12,6 @@ import {
   LoaderCircle,
   MapPin,
   Phone,
-  Scissors,
   UserRound,
 } from "lucide-react";
 import BookingCalendar from "@/components/booking/BookingCalendar";
@@ -25,11 +24,6 @@ import {
 } from "@/lib/booking-utils";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/data/site";
-import {
-  getBookingPriceLabel,
-  getOpeningOffer,
-  openingOffer,
-} from "@/data/opening-offer";
 
 type CustomerState = {
   name: string;
@@ -211,14 +205,6 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
 
   const allTreatments = useMemo(() => catalog?.treatments ?? [], [catalog]);
   const allEmployees = useMemo(() => catalog?.employees ?? [], [catalog]);
-  const offerTreatment = useMemo(
-    () =>
-      allTreatments.find(
-        (treatment) => treatment.id === openingOffer.treatmentId
-      ) ?? null,
-    [allTreatments]
-  );
-
   const selectedTreatmentObject = useMemo(
     () => allTreatments.find((t) => t.id === selectedTreatment) ?? null,
     [allTreatments, selectedTreatment]
@@ -616,44 +602,8 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
                 </p>
               </div>
 
-              {offerTreatment ? (
-                <aside
-                  aria-labelledby="booking-offer-title"
-                  aria-describedby="booking-offer-description"
-                  className="overflow-hidden rounded-[22px] border border-[var(--color-brand)]/60 bg-gray-950 px-5 py-5 text-white shadow-md md:px-6"
-                >
-                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex min-w-0 items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand)]/40 bg-[var(--color-brand)]/10 text-[var(--color-brand-light)]">
-                        <Scissors className="h-5 w-5" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-light)]">
-                          {openingOffer.badge}
-                        </p>
-                        <h3 id="booking-offer-title" className="mt-1 text-[22px] font-bold leading-tight text-white md:text-[26px]">
-                          {openingOffer.treatmentName} kun {openingOffer.priceLabel}
-                        </h3>
-                        <p id="booking-offer-description" className="mt-1 text-[14px] leading-6 text-gray-300">
-                          Vælg åbningstilbuddet her, eller find behandlingen i listen nedenfor.
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => chooseTreatment(offerTreatment.id)}
-                      className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-emerald-700 px-5 text-[14px] font-semibold text-white transition-[filter] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                    >
-                      {openingOffer.ctaLabel}
-                    </button>
-                  </div>
-                </aside>
-              ) : null}
-
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {allTreatments.map((treatment) => {
-                  const offer = getOpeningOffer(treatment.id);
-
                   return (
                     <button
                       key={treatment.id}
@@ -661,34 +611,15 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
                       onClick={() => chooseTreatment(treatment.id)}
                       className={cn(
                         "relative rounded-[22px] border bg-white px-5 py-5 text-left transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-emerald-700 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700",
-                        offer ? "border-emerald-700 shadow-sm" : "border-gray-300"
+                        "border-gray-300"
                       )}
                     >
-                      {offer ? (
-                        <span className="mb-3 inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-amber-900">
-                          {offer.badge}
-                        </span>
-                      ) : null}
                       <h3 className="text-[24px] font-bold leading-none text-gray-900 md:text-[28px]">
                         {treatment.name}
                       </h3>
-                      {offer ? (
-                        <p className="mt-3 flex flex-wrap items-baseline gap-2 text-[14px]">
-                          <span className="text-gray-500 line-through" aria-hidden="true">
-                            {treatment.price}
-                          </span>
-                          <span className="text-[17px] font-bold text-emerald-800" aria-hidden="true">
-                            {offer.priceLabel}
-                          </span>
-                          <span className="sr-only">
-                            Normalpris {treatment.price}. Tilbudspris {offer.priceLabel}.
-                          </span>
-                        </p>
-                      ) : (
-                        <p className="mt-3 text-[14px] font-semibold text-emerald-800">
-                          {treatment.price}
-                        </p>
-                      )}
+                      <p className="mt-3 text-[14px] font-semibold text-emerald-800">
+                        {treatment.price}
+                      </p>
                       <p className="mt-1 text-[14px] text-gray-500">
                         Ca. {treatment.durationMinutes} min
                       </p>
@@ -883,7 +814,7 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
                       </dt>
                       <dd className="text-gray-900">
                         {selectedTreatmentObject
-                          ? getBookingPriceLabel(selectedTreatmentObject)
+                          ? selectedTreatmentObject.price
                           : ""}
                       </dd>
                     </div>
@@ -1089,7 +1020,7 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
                     </dt>
                     <dd className="text-gray-900">
                       {selectedTreatmentObject
-                        ? getBookingPriceLabel(selectedTreatmentObject)
+                        ? selectedTreatmentObject.price
                         : ""}
                     </dd>
                   </div>
