@@ -2,10 +2,13 @@ import { getDb } from "@/lib/db/client";
 import { bookings, customers } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { formatDateLabel } from "@/lib/booking-utils";
+import Link from "next/link";
+import { requireAdmin } from "@/lib/auth/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function BookingsPage() {
+  await requireAdmin();
   const db = getDb();
   
   const allBookings = await db
@@ -22,7 +25,7 @@ export default async function BookingsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">Bookings</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Manage all your appointments and calendar here.
+          Se detaljer og aflys en booking. Aflyste bookinger bliver gemt her.
         </p>
       </div>
       
@@ -42,6 +45,7 @@ export default async function BookingsPage() {
                   <th scope="col" className="px-6 py-4 font-semibold">Behandling</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Medarbejder</th>
                   <th scope="col" className="px-6 py-4 font-semibold text-right">Status</th>
+                  <th scope="col" className="px-6 py-4 font-semibold"><span className="sr-only">Handling</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
@@ -74,8 +78,13 @@ export default async function BookingsPage() {
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-right">
                         <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor}`}>
-                          {booking.status}
+                          {{ confirmed: "Bekræftet", pending: "Afventer", cancelled: "Aflyst", completed: "Afsluttet" }[booking.status]}
                         </span>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <Link href={`/admin/bookings/${encodeURIComponent(booking.id)}`} aria-label={`Se booking for ${customer?.name || "ukendt kunde"}, ${booking.date} kl. ${booking.time}`} className="inline-flex min-h-11 items-center rounded-lg border border-gray-300 px-3 py-2 font-semibold text-emerald-700 hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-600">
+                          Se booking
+                        </Link>
                       </td>
                     </tr>
                   );

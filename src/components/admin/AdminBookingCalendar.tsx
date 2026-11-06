@@ -125,7 +125,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
   const weekAppointments = useMemo(() => {
     const first = toDateKey(days[0]);
     const last = toDateKey(days[6]);
-    return appointments.filter((item) => item.date >= first && item.date <= last);
+    return appointments.filter((item) => item.status !== "cancelled" && item.date >= first && item.date <= last);
   }, [appointments, days]);
 
   const selectedAppointments = useMemo(
@@ -240,7 +240,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
             selectedAppointments.map((appointment) => (
               <Link
                 key={appointment.id}
-                href="/admin/bookings"
+                href={`/admin/bookings/${encodeURIComponent(appointment.id)}`}
                 className={`block rounded-lg border-l-4 p-4 transition-shadow hover:shadow-md ${statusStyles[appointment.status]}`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -336,7 +336,7 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
                   return (
                     <Link
                       key={appointment.id}
-                      href="/admin/bookings"
+                      href={`/admin/bookings/${encodeURIComponent(appointment.id)}`}
                       title={`${appointment.time} · ${appointment.customerName} · ${appointment.treatmentName} · ${statusLabels[appointment.status]}`}
                       className={`absolute inset-x-1 z-10 overflow-hidden rounded-md border-l-4 px-2 py-1 text-xs shadow-sm transition-shadow hover:z-20 hover:shadow-md focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-emerald-600 ${statusStyles[appointment.status]}`}
                       style={{ top: `${Math.max(0, top)}%`, height: `${height}%`, minHeight: 28 }}
@@ -352,12 +352,13 @@ export function AdminBookingCalendar({ appointments, today }: AdminBookingCalend
       </div>
 
       <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-gray-200 bg-gray-50 px-4 py-3 text-xs text-gray-600 sm:px-6">
-        {(Object.keys(statusLabels) as CalendarAppointment["status"][]).map((status) => (
+        {(["confirmed", "pending", "completed"] as const).map((status) => (
           <span key={status} className="inline-flex items-center gap-1.5">
             <span className={`h-2.5 w-2.5 rounded-sm border ${statusStyles[status]}`} aria-hidden="true" />
             {statusLabels[status]}
           </span>
         ))}
+        <span>Aflyste bookinger vises under alle bookinger.</span>
       </div>
     </section>
   );
