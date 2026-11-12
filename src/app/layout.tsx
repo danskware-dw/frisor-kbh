@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
+import { TrackingTags } from "@/components/analytics/TrackingTags";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/consent/CookieConsent";
@@ -139,6 +141,9 @@ export default function RootLayout({
         </a>
         {children}
         <CookieConsent />
+        <Suspense fallback={null}>
+          <TrackingTags />
+        </Suspense>
       </body>
     </html>
   );
