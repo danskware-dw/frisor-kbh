@@ -49,6 +49,7 @@ beforeEach(async () => {
 
 after(async () => {
   await getDb().$client.end();
+  await connection.query("RESET search_path").catch(() => {});
   await connection.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
   await connection.end();
 });

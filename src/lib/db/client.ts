@@ -14,8 +14,14 @@ function getDatabaseUrl(): string {
   // Switch to transaction mode pooler (port 6543) which multiplexes connections per transaction.
   // In automated test runs that rely on session-level `SET search_path`, retain session mode.
   const isTest = process.env.NODE_ENV === "test" || process.env.npm_lifecycle_event === "test";
-  if (!isTest && url.includes(".pooler.supabase.com:5432")) {
-    url = url.replace(/(pooler\.supabase\.com):5432/, "$1:6543");
+  if (!isTest) {
+    if (url.includes(".pooler.supabase.com:5432")) {
+      url = url.replace(/(pooler\.supabase\.com):5432/, "$1:6543");
+    }
+    if (!url.includes("search_path")) {
+      const separator = url.includes("?") ? "&" : "?";
+      url += `${separator}options=-c%20search_path=public`;
+    }
   }
   return url;
 }
