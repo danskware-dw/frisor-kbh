@@ -14,7 +14,12 @@ export const metadata = {
 };
 
 export default async function BookingPage() {
-  const closures = await listSalonClosures();
+  let closures: Awaited<ReturnType<typeof listSalonClosures>> = [];
+  try {
+    closures = await listSalonClosures();
+  } catch (error) {
+    console.error("[BookingPage] Kunne ikke hente lukkedage:", error);
+  }
   return (
     <main
       id="main-content"

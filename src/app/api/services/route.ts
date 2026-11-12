@@ -10,7 +10,7 @@ export async function GET() {
   } catch (error) {
     console.error("[API /services] Error:", error);
     return NextResponse.json(
-      { error: "Kunne ikke hente behandlinger." },
+      { error: "Kunne ikke hente behandlinger. Ring venligst på 42 20 24 29 for at bestille tid." },
       { status: 500 }
     );
   }

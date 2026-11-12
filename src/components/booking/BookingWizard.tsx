@@ -191,8 +191,12 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
         }
         hasRestoredState.current = true;
       })
-      .catch((fetchError: Error) => {
-        if (!cancelled) setError(fetchError.message);
+      .catch(() => {
+        if (!cancelled) {
+          setError(
+            "Vi kunne ikke hente behandlinger lige nu. Ring venligst på 42 20 24 29 for at bestille tid."
+          );
+        }
       })
       .finally(() => {
         if (!cancelled) setLoadingCatalog(false);
@@ -581,9 +585,24 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
           ) : null}
 
           {!loadingCatalog && !catalog ? (
-            <p className="py-10 text-center text-[15px] text-red-800" role="alert">
-              Vi kunne ikke hente behandlinger lige nu. Prøv igen senere, eller ring til os på {siteConfig.contact.phone}.
-            </p>
+            <div
+              className="my-8 rounded-2xl border border-red-200 bg-red-50 p-6 md:p-8 text-center text-red-900"
+              role="alert"
+            >
+              <p className="font-semibold text-base md:text-lg mb-2">
+                Vi kunne ikke hente behandlinger lige nu.
+              </p>
+              <p className="text-sm md:text-base text-red-800">
+                Prøv venligst igen senere, eller ring direkte til os på{" "}
+                <a
+                  href="tel:42202429"
+                  className="font-bold underline hover:text-red-950"
+                >
+                  42 20 24 29
+                </a>{" "}
+                for at bestille din tid.
+              </p>
+            </div>
           ) : null}
 
           {/* ── Step 0: Choose Treatment ── */}

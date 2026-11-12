@@ -5,7 +5,13 @@ import { ServiceCard } from "@/components/ui/ServiceCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import type { ServiceItem } from "@/types/site";
 
-export function Services({ services }: { services: ServiceItem[] }) {
+export function Services({
+  services,
+  errorMessage,
+}: {
+  services: ServiceItem[];
+  errorMessage?: string;
+}) {
   return (
     <section id="services" className="relative overflow-hidden bg-[var(--color-background)] py-20 md:py-28">
       {/* Subtle ambient glow */}
@@ -21,9 +27,29 @@ export function Services({ services }: { services: ServiceItem[] }) {
         </ScrollReveal>
         
         <ScrollReveal stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mt-16">
-          {services.length === 0 ? (
+          {errorMessage ? (
+            <div className="col-span-full rounded-2xl border border-red-500/20 bg-red-500/10 p-6 md:p-8 text-center" role="alert">
+              <p className="text-base md:text-lg font-medium text-red-200 mb-2">
+                {errorMessage}
+              </p>
+              <p className="text-sm text-[var(--color-text-muted)]">
+                Kontakt os gerne direkte på telefon{" "}
+                <a
+                  href="tel:42202429"
+                  className="font-bold text-white underline hover:text-[var(--color-brand-light)]"
+                >
+                  42 20 24 29
+                </a>{" "}
+                for at bestille din tid.
+              </p>
+            </div>
+          ) : services.length === 0 ? (
             <p className="col-span-full rounded-xl border border-white/[0.08] bg-[var(--color-surface)] px-6 py-12 text-center text-sm text-[var(--color-text-muted)]">
-              Behandlingerne bliver opdateret. Kontakt os gerne for pris og booking.
+              Behandlingerne bliver opdateret. Kontakt os gerne for pris og booking på{" "}
+              <a href="tel:42202429" className="font-semibold text-white underline hover:text-[var(--color-brand-light)]">
+                42 20 24 29
+              </a>
+              .
             </p>
           ) : null}
           {services.map((service) => (

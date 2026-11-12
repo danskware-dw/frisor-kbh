@@ -18,20 +18,30 @@ import { getDateKeyInTimeZone } from "@/lib/booking/business-hours";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const db = getDb();
-  const [managedGalleryImages, managedTreatments, closures] = await Promise.all([
-    db
-      .select()
-      .from(galleryImages)
-      .where(eq(galleryImages.active, true))
-      .orderBy(asc(galleryImages.sortOrder), asc(galleryImages.createdAt)),
-    db
-      .select()
-      .from(treatments)
-      .where(eq(treatments.active, true))
-      .orderBy(asc(treatments.sortOrder)),
-    listSalonClosures(),
-  ]);
+  let managedGalleryImages: (typeof galleryImages.$inferSelect)[] = [];
+  let managedTreatments: (typeof treatments.$inferSelect)[] = [];
+  let closures: Awaited<ReturnType<typeof listSalonClosures>> = [];
+  let errorMessage: string | undefined;
+
+  try {
+    const db = getDb();
+    [managedGalleryImages, managedTreatments, closures] = await Promise.all([
+      db
+        .select()
+        .from(galleryImages)
+        .where(eq(galleryImages.active, true))
+        .orderBy(asc(galleryImages.sortOrder), asc(galleryImages.createdAt)),
+      db
+        .select()
+        .from(treatments)
+        .where(eq(treatments.active, true))
+        .orderBy(asc(treatments.sortOrder)),
+      listSalonClosures(),
+    ]);
+  } catch (error) {
+    console.error("[Home] Kunne ikke hente data fra databasen:", error);
+    errorMessage = "Vi kan desværre ikke indlæse vores behandlinger lige nu på grund af en midlertidig teknisk fejl. Ring venligst direkte til os på 42 20 24 29 for at bestille tid.";
+  }
 
   const galleryItems = managedGalleryImages.map((image) => ({
     id: image.id,
@@ -59,7 +69,7 @@ export default async function Home() {
       {/* REC-04: id="main-content" enables skip-to-content link target */}
       <main id="main-content" className="flex min-h-screen flex-col">
         <Hero closures={closures} today={getDateKeyInTimeZone()} />
-        <Services services={serviceItems} />
+        <Services services={serviceItems} errorMessage={errorMessage} />
         <Benefits />
         <OpeningHours />
         <Gallery items={galleryItems} />

@@ -28,8 +28,13 @@ export function validateSalonClosureInput(input: { date: unknown; message?: unkn
 }
 
 export async function listSalonClosures(fromDate = getDateKeyInTimeZone()): Promise<SalonClosure[]> {
-  return getDb().select().from(salonClosures)
-    .where(gte(salonClosures.date, fromDate)).orderBy(asc(salonClosures.date));
+  try {
+    return await getDb().select().from(salonClosures)
+      .where(gte(salonClosures.date, fromDate)).orderBy(asc(salonClosures.date));
+  } catch (error) {
+    console.error("[listSalonClosures] Kunne ikke hente lukkedage:", error);
+    return [];
+  }
 }
 
 export async function assertSalonOpen(date: string, db: Pick<ReturnType<typeof getDb>, "select"> = getDb()) {
