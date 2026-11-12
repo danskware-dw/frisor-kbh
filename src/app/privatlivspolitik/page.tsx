@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function PrivatlivspolitikPage() {
-  const updatedDate = "21. august 2026";
+  const updatedDate = "12. november 2026";
 
   return (
     <main
@@ -76,6 +76,11 @@ export default function PrivatlivspolitikPage() {
                   </a>
                 </span>
               </address>
+            </section>
+
+            <section>
+              <h2 className="text-white font-heading text-2xl uppercase tracking-wide mb-4">Cookies</h2>
+              <p>Google Ads-cookies anvendes kun, hvis du har givet samtykke til marketing. Du kan til enhver tid ændre eller trække dit samtykke tilbage via Cookieindstillinger nederst på siden.</p>
             </section>
 
             <section>

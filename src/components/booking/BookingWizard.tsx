@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import BookingCalendar from "@/components/booking/BookingCalendar";
 import { ClosureNotices } from "@/components/booking/ClosureNotices";
+import { trackConversion } from "@/components/analytics/GoogleAds";
 import type { SalonClosure } from "@/lib/booking/salon-closures";
 import {
   formatDateLabel,
@@ -213,6 +214,9 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
     () => allTreatments.find((t) => t.id === selectedTreatment) ?? null,
     [allTreatments, selectedTreatment]
   );
+  useEffect(() => {
+    if (successId && selectedTreatmentObject) trackConversion(successId, selectedTreatmentObject.price);
+  }, [successId, selectedTreatmentObject]);
   const selectedEmployeeObject = useMemo(
     () => allEmployees.find((e) => e.id === selectedEmployee) ?? null,
     [allEmployees, selectedEmployee]

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { TrackingTags } from "@/components/analytics/TrackingTags";
+import { GoogleAds } from "@/components/analytics/GoogleAds";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/consent/CookieConsent";
@@ -141,6 +142,7 @@ export default function RootLayout({
         </a>
         {children}
         <CookieConsent />
+        <GoogleAds />
         <Suspense fallback={null}>
           <TrackingTags />
         </Suspense>
