@@ -214,9 +214,6 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
     () => allTreatments.find((t) => t.id === selectedTreatment) ?? null,
     [allTreatments, selectedTreatment]
   );
-  useEffect(() => {
-    if (successId && selectedTreatmentObject) trackConversion(successId, selectedTreatmentObject.price);
-  }, [successId, selectedTreatmentObject]);
   const selectedEmployeeObject = useMemo(
     () => allEmployees.find((e) => e.id === selectedEmployee) ?? null,
     [allEmployees, selectedEmployee]
@@ -432,6 +429,7 @@ export default function BookingWizard({ initialClosures, today }: { initialClosu
         throw new Error(payload.error ?? `Booking kunne ikke gennemføres. Prøv igen, eller ring til os på ${siteConfig.contact.phone}.`);
       }
 
+      if (payload.booking?.id) trackConversion(payload.booking.id, selectedTreatmentObject.price);
       setSuccessId(payload.booking?.id ?? "OK");
       sessionStorage.removeItem(BOOKING_STATE_KEY);
       goToStep(4);

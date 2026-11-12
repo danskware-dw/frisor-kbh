@@ -44,12 +44,14 @@ export function GoogleAds() {
 
 export function trackConversion(id: string, price: string | number) {
   const label = process.env.NEXT_PUBLIC_GOOGLE_ADS_BOOKING_LABEL;
-  if (!adsId || !label || !id || typeof window === "undefined") return;
+  if (!adsId || !label || !id || typeof window === "undefined" || !getConsent().marketing) return;
   const key = "frisor-kbh-google-ads-bookings";
   let fired: string[] = [];
   try { fired = JSON.parse(sessionStorage.getItem(key) || "[]"); } catch {}
   if (fired.includes(id)) return;
   fired.push(id);
   try { sessionStorage.setItem(key, JSON.stringify(fired)); } catch {}
-  window.gtag?.("event", "conversion", { send_to: `${adsId}/${label}`, value: Number(String(price).replace(/[^\d,.-]/g, "").replace(",", ".")), currency: "DKK", transaction_id: id });
+  const value = Number(String(price).replace(/[^\d,.-]/g, "").replace(",", "."));
+  if (!Number.isFinite(value)) return;
+  window.gtag?.("event", "conversion", { send_to: `${adsId}/${label}`, value, currency: "DKK", transaction_id: id });
 }
