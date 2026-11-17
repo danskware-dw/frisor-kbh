@@ -153,7 +153,6 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    unoptimized={item.src.startsWith("http")}
                     onError={() =>
                       setImgErrors((previous) => ({ ...previous, [item.id]: true }))
                     }
@@ -261,7 +260,6 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   sizes="(max-width: 1024px) 90vw, 900px"
                   className="object-cover"
                   priority
-                  unoptimized={currentItem.src.startsWith("http")}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[var(--color-surface)] text-[var(--color-text-muted)]">

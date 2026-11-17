@@ -195,7 +195,7 @@ function TreatmentDialog({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={URL.createObjectURL(imageFile)} alt="Forhåndsvisning" className="h-full w-full object-cover" />
                 ) : treatment?.image && !removeImage ? (
-                  <Image src={treatment.image} alt={treatment.imageAlt || treatment.name} fill className="object-cover" unoptimized={treatment.image.startsWith("http")} />
+                  <Image src={treatment.image} alt={treatment.imageAlt || treatment.name} fill className="object-cover" />
                 ) : (
                   <ImagePlus className="h-8 w-8" aria-hidden="true" />
                 )}
@@ -303,7 +303,7 @@ export default function ServicesManager({
                         <td className="px-5 py-3">
                           <div className="flex items-center gap-3">
                             <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
-                              {treatment.image ? <Image src={treatment.image} alt={treatment.imageAlt || treatment.name} fill sizes="80px" className="object-cover" unoptimized={treatment.image.startsWith("http")} /> : <ImagePlus className="absolute inset-0 m-auto h-5 w-5 text-gray-400" aria-hidden="true" />}
+                              {treatment.image ? <Image src={treatment.image} alt={treatment.imageAlt || treatment.name} fill sizes="80px" className="object-cover" /> : <ImagePlus className="absolute inset-0 m-auto h-5 w-5 text-gray-400" aria-hidden="true" />}
                             </div>
                             <div>
                               <p className="font-semibold text-gray-900">{treatment.name}</p>

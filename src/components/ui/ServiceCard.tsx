@@ -39,7 +39,6 @@ export function ServiceCard({ service, className }: ServiceCardProps) {
             fill
             sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-            unoptimized={image.startsWith("http")}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" aria-hidden="true" />
         </div>

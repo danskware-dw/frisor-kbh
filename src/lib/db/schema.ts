@@ -46,7 +46,7 @@ export const categories = pgTable("categories", {
   description: text("description").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
   active: boolean("active").notNull().default(true),
-});
+}).enableRLS();
 
 export const treatments = pgTable("treatments", {
   id: text("id").primaryKey(),
@@ -63,7 +63,7 @@ export const treatments = pgTable("treatments", {
   featured: boolean("featured").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   active: boolean("active").notNull().default(true),
-});
+}).enableRLS();
 
 export const employees = pgTable("employees", {
   id: text("id").primaryKey(),
@@ -72,7 +72,7 @@ export const employees = pgTable("employees", {
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
     .notNull()
     .defaultNow(),
-});
+}).enableRLS();
 
 export const customers = pgTable(
   "customers",
@@ -88,7 +88,7 @@ export const customers = pgTable(
       .defaultNow(),
   },
   (table) => [index("customers_email_idx").on(table.email)]
-);
+).enableRLS();
 
 export const bookings = pgTable(
   "bookings",
@@ -118,7 +118,7 @@ export const bookings = pgTable(
     index("bookings_employee_date_idx").on(table.employeeId, table.date),
     index("bookings_customer_id_idx").on(table.customerId),
   ]
-);
+).enableRLS();
 
 export const emailLogs = pgTable("email_logs", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -131,7 +131,7 @@ export const emailLogs = pgTable("email_logs", {
     .notNull()
     .defaultNow(),
   sentAt: timestamp("sent_at", { withTimezone: true, mode: "string" }),
-});
+}).enableRLS();
 
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -146,7 +146,7 @@ export const adminUsers = pgTable("admin_users", {
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
     .notNull()
     .defaultNow(),
-});
+}).enableRLS();
 
 export const galleryImages = pgTable(
   "gallery_images",
@@ -168,4 +168,4 @@ export const galleryImages = pgTable(
     uniqueIndex("gallery_images_file_hash_idx").on(table.fileHash),
     index("gallery_images_sort_order_idx").on(table.sortOrder),
   ]
-);
+).enableRLS();

@@ -23,6 +23,11 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
+  if (error && error.code !== "invalid_credentials") {
+    // Network failure, quota restriction or Supabase outage — not a wrong password.
+    console.error("Supabase sign-in failed:", error.status, error.code, error.message);
+    return { error: "Login er midlertidigt utilgængeligt. Prøv igen om lidt." };
+  }
   if (error || !data.user) return { error: "E-mail eller adgangskode er forkert." };
 
   const [admin] = await getDb()

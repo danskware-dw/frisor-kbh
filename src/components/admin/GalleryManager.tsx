@@ -67,7 +67,6 @@ function GalleryCard({
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 33vw"
-            unoptimized={image.url.startsWith("http")}
           />
         )}
         <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white ${image.active ? "bg-emerald-700" : "bg-gray-700"}`}>
