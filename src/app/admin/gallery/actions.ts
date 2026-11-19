@@ -7,6 +7,12 @@ import { z } from "zod";
 import { getDb } from "@/lib/db/client";
 import { galleryImages } from "@/lib/db/schema";
 import { requireAdmin } from "@/lib/auth/admin";
+import { getVideoPosterPath } from "@/lib/images/video-poster";
+
+// Every visitor who opens a video downloads the whole file from Supabase Storage,
+// so videos are kept small. Keep in sync with GalleryUploader.
+const VIDEO_MAX_BYTES = 8 * 1024 * 1024;
+const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
 const idSchema = z.string().uuid();
 const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
@@ -31,7 +37,7 @@ const uploadRequestSchema = z.object({
     "video/webm",
     "video/quicktime",
   ]),
-  fileSize: z.number().int().positive().max(15 * 1024 * 1024),
+  fileSize: z.number().int().positive().max(VIDEO_MAX_BYTES),
   fileHash: hashSchema,
 });
 
@@ -74,7 +80,7 @@ export async function prepareGalleryUpload(input: z.input<typeof uploadRequestSc
   const mediaType: "image" | "video" = parsed.data.mimeType.startsWith("video/")
     ? "video"
     : "image";
-  if (mediaType === "image" && parsed.data.fileSize > 5 * 1024 * 1024) {
+  if (mediaType === "image" && parsed.data.fileSize > IMAGE_MAX_BYTES) {
     return { success: false, error: "Billedet må højst fylde 5 MB." };
   }
 
@@ -104,7 +110,23 @@ export async function prepareGalleryUpload(input: z.input<typeof uploadRequestSc
     return { success: false, error: "Upload kunne ikke forberedes." };
   }
 
-  return { success: true, storagePath, token: data.token, mediaType };
+  let posterToken: string | undefined;
+  if (mediaType === "video") {
+    const poster = await supabase.storage
+      .from("gallery")
+      .createSignedUploadUrl(getVideoPosterPath(storagePath));
+    if (poster.error) console.error("Failed to create signed poster upload:", poster.error);
+    posterToken = poster.data?.token;
+  }
+
+  return {
+    success: true,
+    storagePath,
+    token: data.token,
+    mediaType,
+    posterPath: posterToken ? getVideoPosterPath(storagePath) : undefined,
+    posterToken,
+  };
 }
 
 export async function addGalleryImage(input: z.input<typeof galleryInputSchema>) {
@@ -234,7 +256,10 @@ export async function deleteGalleryImage(id: string) {
   if (image.storagePath) {
     const supabase = getSupabaseAdmin();
     if (supabase) {
-      const { error } = await supabase.storage.from("gallery").remove([image.storagePath]);
+      const paths = image.mediaType === "video"
+        ? [image.storagePath, getVideoPosterPath(image.storagePath)]
+        : [image.storagePath];
+      const { error } = await supabase.storage.from("gallery").remove(paths);
       if (error) {
         console.error("Failed to remove gallery storage object:", error);
         warning = "Mediet blev fjernet fra galleriet, men lagerfilen kunne ikke slettes.";

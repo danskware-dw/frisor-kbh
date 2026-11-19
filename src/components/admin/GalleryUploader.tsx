@@ -5,13 +5,15 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import { Images, LoaderCircle, Upload } from "lucide-react";
 import { prepareImageUpload } from "@/lib/images/prepare-upload";
+import { createVideoPoster } from "@/lib/images/video-poster";
 import {
   addGalleryImage,
   prepareGalleryUpload,
 } from "@/app/admin/gallery/actions";
 
 const IMAGE_MAX_FILE_SIZE = 5 * 1024 * 1024;
-const VIDEO_MAX_FILE_SIZE = 15 * 1024 * 1024;
+// Each video view is a full download from Supabase Storage. Keep in sync with gallery/actions.ts.
+const VIDEO_MAX_FILE_SIZE = 8 * 1024 * 1024;
 const ACCEPTED_TYPES = [
   "image/jpeg",
   "image/png",
@@ -70,7 +72,11 @@ export default function GalleryUploader() {
         const isVideo = file.type.startsWith("video/");
         const maximumSize = isVideo ? VIDEO_MAX_FILE_SIZE : IMAGE_MAX_FILE_SIZE;
         if (file.size > maximumSize) {
-          throw new Error(`${file.name}: filen er større end ${isVideo ? 15 : 5} MB.`);
+          throw new Error(
+            isVideo
+              ? `${file.name}: videoen er større end 8 MB. Gør den kortere eller eksportér den i lavere kvalitet (fx 720p) og prøv igen.`
+              : `${file.name}: filen er større end 5 MB.`
+          );
         }
 
         const uploadFile = isVideo ? file : await prepareImageUpload(file);
@@ -99,6 +105,20 @@ export default function GalleryUploader() {
           });
         if (uploadError) throw new Error(`${file.name}: ${uploadError.message}`);
 
+        const uploadedPaths = [storagePath];
+        if (isVideo && uploadRequest.posterPath && uploadRequest.posterToken) {
+          const poster = await createVideoPoster(file);
+          if (poster) {
+            const { error: posterError } = await supabase.storage
+              .from("gallery")
+              .uploadToSignedUrl(uploadRequest.posterPath, uploadRequest.posterToken, poster, {
+                cacheControl: "31536000",
+                contentType: "image/webp",
+              });
+            if (!posterError) uploadedPaths.push(uploadRequest.posterPath);
+          }
+        }
+
         const { data } = supabase.storage.from("gallery").getPublicUrl(storagePath);
         const result = await addGalleryImage({
           url: data.publicUrl,
@@ -109,7 +129,7 @@ export default function GalleryUploader() {
         });
 
         if (!result.success) {
-          await supabase.storage.from("gallery").remove([storagePath]);
+          await supabase.storage.from("gallery").remove(uploadedPaths);
           if (result.duplicate) {
             duplicates += 1;
             continue;
@@ -161,7 +181,7 @@ export default function GalleryUploader() {
           />
         </label>
         <p className="mt-3 text-xs text-gray-500">
-          Billeder komprimeres automatisk før upload (maks. 5 MB original). Videoer: MP4, WebM eller MOV · maks. 15 MB.
+          Billeder komprimeres automatisk før upload (maks. 5 MB original). Videoer: MP4, WebM eller MOV · maks. 8 MB (720p anbefales).
         </p>
         {message ? <p className="mt-4 text-sm font-medium text-emerald-700" role="status">{message}</p> : null}
         {error ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{error}</p> : null}

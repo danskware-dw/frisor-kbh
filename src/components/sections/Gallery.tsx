@@ -8,10 +8,7 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { ChevronLeft, ChevronRight, Play, X, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GalleryItem } from "@/types/site";
-
-function getVideoPreviewSource(src: string) {
-  return `${src.split("#", 1)[0]}#t=0.1`;
-}
+import { getVideoPosterPath } from "@/lib/images/video-poster";
 
 export function Gallery({ items }: { items: GalleryItem[] }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -131,24 +128,16 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-light)]"
                 )}
               >
-                {item.mediaType === "video" ? (
-                  <video
-                    src={getVideoPreviewSource(item.src)}
-                    aria-label={item.alt}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    muted
-                    playsInline
-                    preload="none"
-                    onLoadedMetadata={(event) => {
-                      const video = event.currentTarget;
-                      if (video.duration > 0 && video.currentTime < 0.1) {
-                        video.currentTime = Math.min(0.1, video.duration / 2);
-                      }
-                    }}
+                {/* Videos show a small poster still here. The video file itself is only
+                    requested from Supabase Storage when a visitor opens it. */}
+                {item.mediaType === "video" && imgErrors[item.id] ? (
+                  <div
+                    className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-surface-light),var(--color-surface))]"
+                    aria-hidden="true"
                   />
                 ) : !imgErrors[item.id] ? (
                   <Image
-                    src={item.src}
+                    src={item.mediaType === "video" ? getVideoPosterPath(item.src) : item.src}
                     alt={item.alt}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -245,6 +234,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                 <video
                   key={currentItem.id}
                   src={currentItem.src}
+                  poster={imgErrors[currentItem.id] ? undefined : getVideoPosterPath(currentItem.src)}
                   aria-label={currentItem.alt}
                   className="h-full w-full bg-black object-contain"
                   controls
