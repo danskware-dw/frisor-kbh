@@ -138,7 +138,7 @@ export function Gallery({ items }: { items: GalleryItem[] }) {
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     muted
                     playsInline
-                    preload="metadata"
+                    preload="none"
                     onLoadedMetadata={(event) => {
                       const video = event.currentTarget;
                       if (video.duration > 0 && video.currentTime < 0.1) {

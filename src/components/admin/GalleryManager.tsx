@@ -58,7 +58,7 @@ function GalleryCard({
             controls
             muted
             playsInline
-            preload="metadata"
+            preload="none"
           />
         ) : (
           <Image

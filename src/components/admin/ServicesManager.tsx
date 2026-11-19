@@ -5,6 +5,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react";
+import { prepareImageUpload } from "@/lib/images/prepare-upload";
 import {
   addTreatment,
   deleteTreatment,
@@ -108,9 +109,10 @@ function TreatmentDialog({
         }
         if (imageFile.size > MAX_IMAGE_SIZE) throw new Error("Billedet må højst fylde 5 MB.");
 
+        const uploadFile = await prepareImageUpload(imageFile);
         const prepared = await prepareTreatmentImageUpload({
-          mimeType: imageFile.type as (typeof ACCEPTED_IMAGE_TYPES)[number],
-          fileSize: imageFile.size,
+          mimeType: uploadFile.type as (typeof ACCEPTED_IMAGE_TYPES)[number],
+          fileSize: uploadFile.size,
         });
         if (!prepared.success || !prepared.storagePath || !prepared.token) {
           throw new Error(prepared.error || "Upload kunne ikke forberedes.");
@@ -118,9 +120,9 @@ function TreatmentDialog({
         newStoragePath = prepared.storagePath;
         const uploaded = await supabase.storage
           .from("services")
-          .uploadToSignedUrl(prepared.storagePath, prepared.token, imageFile, {
+          .uploadToSignedUrl(prepared.storagePath, prepared.token, uploadFile, {
             cacheControl: "31536000",
-            contentType: imageFile.type,
+            contentType: uploadFile.type,
           });
         if (uploaded.error) throw new Error(uploaded.error.message);
 
@@ -205,7 +207,7 @@ function TreatmentDialog({
                   Behandlingsbillede
                   <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { setImageFile(event.target.files?.[0] ?? null); setRemoveImage(false); }} className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-700 file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-emerald-800" />
                 </label>
-                <p className="text-xs text-gray-500">JPG, PNG eller WebP · maks. 5 MB</p>
+                <p className="text-xs text-gray-500">JPG, PNG eller WebP · maks. 5 MB original; komprimeres automatisk ved upload</p>
                 {treatment?.image ? (
                   <label className="flex items-center gap-2 text-sm text-gray-700">
                     <input type="checkbox" checked={removeImage} onChange={(event) => { setRemoveImage(event.target.checked); if (event.target.checked) setImageFile(null); }} className="h-4 w-4 accent-emerald-700" /> Fjern nuværende billede

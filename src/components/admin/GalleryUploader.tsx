@@ -4,13 +4,14 @@ import { useMemo, useRef, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import { Images, LoaderCircle, Upload } from "lucide-react";
+import { prepareImageUpload } from "@/lib/images/prepare-upload";
 import {
   addGalleryImage,
   prepareGalleryUpload,
 } from "@/app/admin/gallery/actions";
 
 const IMAGE_MAX_FILE_SIZE = 5 * 1024 * 1024;
-const VIDEO_MAX_FILE_SIZE = 50 * 1024 * 1024;
+const VIDEO_MAX_FILE_SIZE = 15 * 1024 * 1024;
 const ACCEPTED_TYPES = [
   "image/jpeg",
   "image/png",
@@ -69,14 +70,16 @@ export default function GalleryUploader() {
         const isVideo = file.type.startsWith("video/");
         const maximumSize = isVideo ? VIDEO_MAX_FILE_SIZE : IMAGE_MAX_FILE_SIZE;
         if (file.size > maximumSize) {
-          throw new Error(`${file.name}: filen er større end ${isVideo ? 50 : 5} MB.`);
+          throw new Error(`${file.name}: filen er større end ${isVideo ? 15 : 5} MB.`);
         }
 
-        const fileHash = await sha256(file);
+        const uploadFile = isVideo ? file : await prepareImageUpload(file);
+        const uploadMimeType = uploadFile.type as (typeof ACCEPTED_TYPES)[number];
+        const fileHash = await sha256(uploadFile);
         const uploadRequest = await prepareGalleryUpload({
           fileName: file.name,
-          mimeType: file.type as (typeof ACCEPTED_TYPES)[number],
-          fileSize: file.size,
+          mimeType: uploadMimeType,
+          fileSize: uploadFile.size,
           fileHash,
         });
         if (uploadRequest.duplicate) {
@@ -90,9 +93,9 @@ export default function GalleryUploader() {
         const storagePath = uploadRequest.storagePath;
         const { error: uploadError } = await supabase.storage
           .from("gallery")
-          .uploadToSignedUrl(storagePath, uploadRequest.token, file, {
+          .uploadToSignedUrl(storagePath, uploadRequest.token, uploadFile, {
             cacheControl: "31536000",
-            contentType: file.type,
+            contentType: uploadMimeType,
           });
         if (uploadError) throw new Error(`${file.name}: ${uploadError.message}`);
 
@@ -158,7 +161,7 @@ export default function GalleryUploader() {
           />
         </label>
         <p className="mt-3 text-xs text-gray-500">
-          Billeder: JPG, PNG eller WebP · maks. 5 MB. Videoer: MP4, WebM eller MOV · maks. 50 MB.
+          Billeder komprimeres automatisk før upload (maks. 5 MB original). Videoer: MP4, WebM eller MOV · maks. 15 MB.
         </p>
         {message ? <p className="mt-4 text-sm font-medium text-emerald-700" role="status">{message}</p> : null}
         {error ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{error}</p> : null}

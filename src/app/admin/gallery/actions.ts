@@ -31,7 +31,7 @@ const uploadRequestSchema = z.object({
     "video/webm",
     "video/quicktime",
   ]),
-  fileSize: z.number().int().positive().max(50 * 1024 * 1024),
+  fileSize: z.number().int().positive().max(15 * 1024 * 1024),
   fileHash: hashSchema,
 });
 
